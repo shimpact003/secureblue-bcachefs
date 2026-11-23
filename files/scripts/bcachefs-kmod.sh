@@ -32,7 +32,6 @@ echo "unpacking srpm"
 rpm2cpio "$SRPM" | cpio -idm
 
 echo "Pulling version and source for kmod"
-echo "Version:"
 VERSION=$(rpm -qp --qf '%{VERSION}' "$SRPM")
 echo "$VERSION"
 SOURCE=$(find . -maxdepth 1 -name '*.tar.zst' -print -quit)
@@ -40,7 +39,7 @@ echo "$SOURCE"
 
 SOURCE_NAME=$(basename "$SOURCE")
 echo "$SOURCE_NAME"
-TOPDIR=$(tar -tf "$SOURCE" | head -n1 | cut -d/ -f1)
+TOPDIR=$(tar -tf "$SOURCE" | sed -n '1{s|/.*||;p;}')
 echo "$TOPDIR"
 
 echo "Substituting with real vars"
