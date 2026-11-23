@@ -14,7 +14,6 @@ stages:
     from: fedora:latest
     modules:
       - type: copy
-        from: local
         src: files/rpms
         dest: /tmp/rpms/
 
