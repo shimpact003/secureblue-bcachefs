@@ -1,0 +1,84 @@
+# Taken from https://github.com/AaronFriel/fedoratek/blob/main/packaging/bcachefs-kmod/bcachefs-kmod.spec.in
+# Need to ask for license conditions
+%global buildforkernels akmod
+%global debug_package %{nil}
+%global _name bcachefs
+
+Name:           %{_name}-kmod
+Version:        @VERSION@
+Release:        1%{?dist}
+Summary:        Bcachefs kernel module
+License:        GPL-2.0-only
+URL:            https://bcachefs.org/
+Source0:        @SOURCE0@
+
+BuildRequires:  gcc
+BuildRequires:  kmodtool
+BuildRequires:  make
+
+%{expand:%(kmodtool --target %{_target_cpu} --repo rpmfusion --kmodname %{_name} %{?buildforkernels:--%{buildforkernels}} %{?kernels:--for-kernels "%{?kernels}"} 2>/dev/null) }
+
+%description
+This package provides the bcachefs kernel module source in akmod form.
+
+%package common
+Summary:        Common files for the bcachefs kernel module
+BuildArch:      noarch
+Requires:       bcachefs-tools >= %{version}
+
+%description common
+This package contains the common files for the bcachefs akmod package.
+
+%prep
+%{?kmodtool_check}
+
+# Print kmodtool output for debugging purposes.
+kmodtool --target %{_target_cpu} --repo rpmfusion --kmodname %{_name} %{?buildforkernels:--%{buildforkernels}} %{?kernels:--for-kernels "%{?kernels}"} 2>/dev/null
+
+%setup -q -n @TOPDIR@
+printf '%{version}\n' > .version
+printf '#define bcachefs_version "%{version}"\n' > version.h
+sed 's|@PACKAGE_VERSION@|%{version}|g' dkms/dkms.conf.in > dkms/dkms.conf
+mkdir -p "%{_builddir}/%{name}-%{version}/_akmod_src/src/fs/bcachefs"
+install -m0644 dkms/Makefile "%{_builddir}/%{name}-%{version}/_akmod_src/"
+install -m0644 dkms/dkms.conf "%{_builddir}/%{name}-%{version}/_akmod_src/"
+install -m0644 libbcachefs/Makefile "%{_builddir}/%{name}-%{version}/_akmod_src/src/fs/bcachefs/"
+(cd libbcachefs && find . -name '*.[ch]' -exec install -D -m0644 {} "%{_builddir}/%{name}-%{version}/_akmod_src/src/fs/bcachefs/{}" \;)
+install -m0644 dkms/module-version.c "%{_builddir}/%{name}-%{version}/_akmod_src/src/fs/bcachefs/"
+install -m0644 version.h "%{_builddir}/%{name}-%{version}/_akmod_src/src/fs/bcachefs/"
+if [ -f "%{_builddir}/%{name}-%{version}/_akmod_src/src/fs/bcachefs/debug/trace.h" ]; then
+  sed -i 's|^#define TRACE_INCLUDE_PATH \.\./\.\./fs/bcachefs$|#define TRACE_INCLUDE_PATH .|' "%{_builddir}/%{name}-%{version}/_akmod_src/src/fs/bcachefs/debug/trace.h"
+fi
+if [ -f "%{_builddir}/%{name}-%{version}/_akmod_src/src/fs/bcachefs/trace.h" ]; then
+  sed -i 's|^#define TRACE_INCLUDE_PATH \.\./\.\./fs/bcachefs$|#define TRACE_INCLUDE_PATH .|' "%{_builddir}/%{name}-%{version}/_akmod_src/src/fs/bcachefs/trace.h"
+fi
+for kernel_version in %{?kernel_versions}; do
+  cp -a "%{_builddir}/%{name}-%{version}/_akmod_src" "%{_builddir}/%{name}-%{version}/_kmod_build_${kernel_version%%___*}"
+done
+
+%build
+for kernel_version in %{?kernel_versions}; do
+  make %{?_smp_mflags} \
+    -C ${kernel_version##*___} \
+    M="%{_builddir}/%{name}-%{version}/_kmod_build_${kernel_version%%___*}" \
+    modules
+done
+
+%install
+rm -rf %{buildroot}
+for kernel_version in %{?kernel_versions}; do
+  make \
+    -C ${kernel_version##*___} \
+    M="%{_builddir}/%{name}-%{version}/_kmod_build_${kernel_version%%___*}" \
+    INSTALL_MOD_PATH=%{buildroot} \
+    INSTALL_MOD_DIR=%{kmodinstdir_postfix} \
+    modules_install
+done
+%{?akmod_install}
+
+%files common
+%license COPYING
+
+%changelog
+* Sat Mar 14 2026 Fedoratek <noreply@example.invalid> - @VERSION@-1
+- Initial akmod packaging for bcachefs
