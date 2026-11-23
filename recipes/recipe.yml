@@ -1,4 +1,3 @@
----
 # yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
 # image will be published to ghcr.io/<user>/<name>
 name: kinoite-nvidia-open-hardened-bcachefs
@@ -61,12 +60,14 @@ modules:
     dest: /tmp/bcachefs-rpms/
   - type: rpm-ostree
     install:
-      packages:
-        - micro
-        - bcachefs-tools
-        - /tmp/bcachefs-rpms/bcachefs-kmod-*.rpm
+      - micro
+      - bcachefs-tools
     remove:
-      packages:
-        - firefox
-        - firefox-langpacks
+      - firefox
+      - firefox-langpacks
+  - type: script
+    snippets:
+      - |
+        set -euo pipefail
+        rpm-ostree install /tmp/bcachefs-rpms/*.rpm
   - type: signing
