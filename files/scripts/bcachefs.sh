@@ -29,6 +29,9 @@ cd bcachefs-tools
 # How did that pass for anyone?
 sed -i "s|0%{?_version}|%{!?_version:0}%{?_version}|" bcachefs-tools.spec
 
+echo "Downloading Fedora source archives"
+spectool -g -C /tmp/rpmbuild/SOURCES bcachefs-tools.spec
+
 echo "Building source RPM"
 rpmbuild -bs \
     --define "_topdir /tmp/rpmbuild" \
