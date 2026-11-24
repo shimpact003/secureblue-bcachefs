@@ -25,10 +25,15 @@ modules:
     install:
       packages:
         - micro
-        - bcachefs-tools
-        - /tmp/bcachefs-rpms/*.rpm
     remove:
       packages:
         - firefox
         - firefox-langpacks
+  - type: script
+    snippets:
+    - |
+      rm /tmp/bcachefs-rpms/*dkms*
+      rm /tmp/bcachefs-rpms/akmod*
+      dnf5 install -y \
+        /tmp/bcachefs-rpms/*.rpm
   - type: signing

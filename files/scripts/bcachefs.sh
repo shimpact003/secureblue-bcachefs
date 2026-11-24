@@ -34,8 +34,8 @@ spectool -g -C /tmp/rpmbuild/SOURCES \
     --define "_version ${VERSION#v}" \
     bcachefs-tools.spec
 
-echo "Building source RPM"
-rpmbuild -bs \
+echo "Building bcachefs-tools"
+rpmbuild -ba \
     --define "_topdir /tmp/rpmbuild" \
     --define "_version ${VERSION#v}" \
     bcachefs-tools.spec
