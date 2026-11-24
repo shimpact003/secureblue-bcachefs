@@ -4,7 +4,6 @@ set -euo pipefail
 echo "Installing dependencies"
 dnf install -y \
     git \
-    fedpkg \
     dnf-plugins-core \
     rpm-build \
     rpmdevtools \
@@ -13,8 +12,6 @@ dnf install -y \
     gcc \
     make \
     kmodtool \
-    python3-krb5 \
-    krb5-libs
 
 echo "Creating directory layout"
 mkdir -p \
@@ -31,7 +28,7 @@ git clone --depth=1 --branch=rawhide \
 cd bcachefs-tools
 
 echo "Downloading Fedora source archives"
-fedpkg sources
+spectool -g -C /tmp/rpmbuild/SOURCES bcachefs-tools.spec
 
 echo "Building source RPM"
 rpmbuild -bs \
