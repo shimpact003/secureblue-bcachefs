@@ -12,7 +12,9 @@ dnf install -y \
     tar \
     gcc \
     make \
-    kmodtool
+    kmodtool \
+    python3-krb5 \
+    krb5-libs
 
 echo "Creating directory layout"
 mkdir -p \
