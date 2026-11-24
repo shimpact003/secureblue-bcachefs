@@ -28,6 +28,7 @@ git clone --depth=1 --branch=rawhide \
 cd bcachefs-tools
 
 echo "Downloading Fedora source archives"
+cp bcachefs-tools-no-make-rust.patch bcachefs-tools-no-prebuilt-dkms.patch /tmp/rpmbuild/SOURCES
 spectool -g -C /tmp/rpmbuild/SOURCES bcachefs-tools.spec
 
 echo "Building source RPM"
