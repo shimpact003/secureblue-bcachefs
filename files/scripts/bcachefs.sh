@@ -30,7 +30,9 @@ cd bcachefs-tools
 sed -i "s|0%{?_version}|%{!?_version:0}%{?_version}|" bcachefs-tools.spec
 
 echo "Downloading Fedora source archives"
-spectool -g -C /tmp/rpmbuild/SOURCES bcachefs-tools.spec
+spectool -g -C /tmp/rpmbuild/SOURCES \
+    --define "_version ${VERSION#v}" \
+    bcachefs-tools.spec
 
 echo "Building source RPM"
 rpmbuild -bs \
