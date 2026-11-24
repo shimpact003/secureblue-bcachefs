@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-
+VERSION=v1.39.7
 echo "Installing dependencies"
 dnf install -y \
     git \
@@ -22,7 +22,7 @@ mkdir -p \
 cd /tmp/bcachefs-source
 echo "Cloning Upstream bcachefs"
 git clone --depth=1 \
-    --branch=v1.39.7 \
+    --branch=$VERSION \
     https://github.com/koverstreet/bcachefs-tools
 
 cd bcachefs-tools
@@ -30,6 +30,7 @@ cd bcachefs-tools
 echo "Building source RPM"
 rpmbuild -bs \
     --define "_topdir /tmp/rpmbuild" \
+    --define "_version ${VERSION#v}" \
     bcachefs-tools.spec
 
 SRPM=$(find /tmp/rpmbuild/SRPMS \
