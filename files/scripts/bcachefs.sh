@@ -27,9 +27,6 @@ git clone --depth=1 \
 
 cd bcachefs-tools
 
-echo "Downloading Fedora source archives"
-spectool -g -C /tmp/rpmbuild/SOURCES bcachefs-tools.spec
-
 echo "Building source RPM"
 rpmbuild -bs \
     --define "_topdir /tmp/rpmbuild" \
