@@ -34,6 +34,11 @@ spectool -g -C /tmp/rpmbuild/SOURCES \
     --define "_version ${VERSION#v}" \
     bcachefs-tools.spec
 
+echo "Installing build dependencies"
+dnf builddep -y \
+    --define "_topdir /tmp/rpmbuild" \
+    --define "_version ${VERSION#v}" \
+    bcachefs-tools.spec
 echo "Building bcachefs-tools"
 rpmbuild -ba \
     --define "_topdir /tmp/rpmbuild" \
@@ -47,9 +52,6 @@ if [[ -z "$SRPM" ]]; then
     echo "SRPM not found"
     exit 1
 fi
-
-echo "Installing build dependencies"
-dnf builddep -y "$SRPM"
 
 echo "Extracting SRPM"
 cd /tmp/bcachefs-source
