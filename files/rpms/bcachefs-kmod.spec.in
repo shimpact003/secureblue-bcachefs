@@ -16,7 +16,7 @@ BuildRequires:  gcc
 BuildRequires:  kmodtool
 BuildRequires:  make
 
-%{expand:%(kmodtool --target %{_target_cpu} --repo rpmfusion --kmodname %{_name} %{?buildforkernels:--%{buildforkernels}} %{?kernels:--for-kernels "%{?kernels}"} 2>/dev/null) }
+%{expand:%(kmodtool --target %{_target_cpu} --kmodname %{_name} %{?buildforkernels:--%{buildforkernels}} %{?kernels:--for-kernels "%{?kernels}"} 2>/dev/null) }
 
 %description
 This package provides the bcachefs kernel module source in akmod form.
@@ -33,26 +33,12 @@ This package contains the common files for the bcachefs akmod package.
 %{?kmodtool_check}
 
 # Print kmodtool output for debugging purposes.
-kmodtool --target %{_target_cpu} --repo rpmfusion --kmodname %{_name} %{?buildforkernels:--%{buildforkernels}} %{?kernels:--for-kernels "%{?kernels}"} 2>/dev/null
+kmodtool --target %{_target_cpu} --kmodname %{_name} %{?buildforkernels:--%{buildforkernels}} %{?kernels:--for-kernels "%{?kernels}"} 2>/dev/null
 
 %setup -q -n @TOPDIR@
-printf '%{version}\n' > .version
-printf '#define bcachefs_version "%{version}"\n' > version.h
-sed 's|@PACKAGE_VERSION@|%{version}|g' dkms/dkms.conf.in > dkms/dkms.conf
-mkdir -p "%{_builddir}/%{name}-%{version}/_akmod_src/src/fs/bcachefs"
-install -m0644 dkms/Makefile "%{_builddir}/%{name}-%{version}/_akmod_src/"
-install -m0644 dkms/dkms.conf "%{_builddir}/%{name}-%{version}/_akmod_src/"
-bash scripts/install-to-kernel.sh "%{_builddir}/%{name}"
-install -m0644 dkms/module-version.c "%{_builddir}/%{name}-%{version}/_akmod_src/src/fs/bcachefs/"
-install -m0644 version.h "%{_builddir}/%{name}-%{version}/_akmod_src/src/fs/bcachefs/"
-if [ -f "%{_builddir}/%{name}-%{version}/_akmod_src/src/fs/bcachefs/debug/trace.h" ]; then
-  sed -i 's|^#define TRACE_INCLUDE_PATH \.\./\.\./fs/bcachefs$|#define TRACE_INCLUDE_PATH .|' "%{_builddir}/%{name}-%{version}/_akmod_src/src/fs/bcachefs/debug/trace.h"
-fi
-if [ -f "%{_builddir}/%{name}-%{version}/_akmod_src/src/fs/bcachefs/trace.h" ]; then
-  sed -i 's|^#define TRACE_INCLUDE_PATH \.\./\.\./fs/bcachefs$|#define TRACE_INCLUDE_PATH .|' "%{_builddir}/%{name}-%{version}/_akmod_src/src/fs/bcachefs/trace.h"
-fi
+bash scripts/install-to-kernel.sh "%{_builddir}/%{name}-${version}/_kmod_build"
 for kernel_version in %{?kernel_versions}; do
-  cp -a "%{_builddir}/%{name}-%{version}/_akmod_src" "%{_builddir}/%{name}-%{version}/_kmod_build_${kernel_version%%___*}"
+  bash scripts/install-to-kernel.sh "%{_builddir}/%{name}-%{version}/_kmod_build_${kernel_version%%___*}"
 done
 
 %build

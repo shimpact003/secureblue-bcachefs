@@ -21,14 +21,13 @@ mkdir -p \
 
 cd /tmp/bcachefs-source
 
-echo "Cloning Fedora packaging"
+echo "Cloning Upstream bcachefs"
 git clone --depth=1 --branch=rawhide \
-    https://src.fedoraproject.org/rpms/bcachefs-tools
+    https://github.com/koverstreet/bcachefs-tools
 
 cd bcachefs-tools
 
 echo "Downloading Fedora source archives"
-cp bcachefs-tools-no-make-rust.patch bcachefs-tools-no-prebuilt-dkms.patch /tmp/rpmbuild/SOURCES
 spectool -g -C /tmp/rpmbuild/SOURCES bcachefs-tools.spec
 
 echo "Building source RPM"
