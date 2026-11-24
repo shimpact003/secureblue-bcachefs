@@ -26,6 +26,8 @@ git clone --depth=1 \
     https://github.com/koverstreet/bcachefs-tools
 
 cd bcachefs-tools
+# How did that pass for anyone?
+sed -i "s|0%{?_version}|%{!?_version:0}%{?_version}|" bcachefs-tools.spec
 
 echo "Building source RPM"
 rpmbuild -bs \
