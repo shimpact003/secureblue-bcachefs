@@ -20,9 +20,9 @@ mkdir -p \
     /tmp/rpms/output
 
 cd /tmp/bcachefs-source
-
 echo "Cloning Upstream bcachefs"
-git clone --depth=1 --branch=rawhide \
+git clone --depth=1 \
+    --branch=v1.39.7
     https://github.com/koverstreet/bcachefs-tools
 
 cd bcachefs-tools
